@@ -93,16 +93,13 @@ end
 --]]
 local function draw(binding: Binding, time: number)
 	local out = binding.Out
+	table.clear(out)
 
-	out.Color = nil
-	out.Emission = nil
-	out.Transparency = nil
-
-	local ok, problem = pcall(binding.Shader.Evaluate :: any, binding.Params, binding.Inputs, time, out)
+	local ok, err = pcall(binding.Shader.Evaluate :: any, binding.Params, binding.Inputs, time, out)
 
 	if not ok then
 		binding.Broken = true
-		warn(`[Shading] {binding.Shader.Name} errored and was stopped - {problem}`)
+		warn(`[Shading] {binding.Shader.Name} errored and was stopped - {err}`)
 		return
 	end
 
