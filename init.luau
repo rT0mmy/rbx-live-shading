@@ -79,6 +79,25 @@ function Shading.Evaluate(material: Material, inputs: { [string]: number }?, tim
 	return out
 end
 
+--[[
+	Writes a material onto instances once
+
+	@param material Material -- sanitized
+	@param targets {Instance} -- parts and lights; anything no writer draws on is skipped
+	@param options Options?
+	@param time number? -- 0 by default
+	@return nil
+--]]
+function Shading.Apply(material: Material, targets: { Instance }, options: Options?, time: number?)
+	local out = Shading.Evaluate(material, nil, time or 0)
+	local written = { Emissive = options ~= nil and options.Emissive == true }
+
+	for _, target in targets do
+		local writer = Writers.For(target)
+		if writer then writer.Write(target, out, {}, writer.Capture(target), written, false) end
+	end
+end
+
 --// Bindings
 
 local BindingClass = {}

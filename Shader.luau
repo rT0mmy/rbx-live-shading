@@ -13,6 +13,7 @@ export type Out = {
 	Color: Color3?,
 	Emission: number?, -- 0..1: how lit; drives Neon on emissive parts and light brightness
 	Transparency: number?, -- 0..1
+	MaterialVariant: string?, -- a MaterialVariant under MaterialService; the part takes its base material
 }
 
 export type Evaluate = (params: { [string]: any }, inputs: { [string]: number }, time: number, out: Out) -> ()
