@@ -3,13 +3,11 @@
 
 local Param = require(`./Param`)
 local Shader = require(`./Shader`)
+local Types = require(`./Types`)
 
 local Material = {}
 
-export type Material = {
-	Shader: string,
-	Params: { [string]: any }, -- clean data: numbers, booleans, option names, 'RRGGBB' colours
-}
+export type Material = Types.Material
 
 --[[
 	A clean material from untrusted input. Every param the shader has is filled in, missing or

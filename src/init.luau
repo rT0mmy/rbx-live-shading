@@ -25,20 +25,33 @@ local Glow = Shading.Shader {
 ]]
 
 local Config = require(`@self/Config`)
+local Group = require(`@self/Group`)
 local Material = require(`@self/Material`)
 local Param = require(`@self/Param`)
 local Renderer = require(`@self/Renderer`)
 local Shader = require(`@self/Shader`)
+local Types = require(`@self/Types`)
+local Wire = require(`@self/Wire`)
 local Writers = require(`@self/Writers`)
 
 local Shading = {}
 
-export type Shader = Shader.Shader
-export type ShaderDef = Shader.Def
-export type Material = Material.Material
-export type Out = Shader.Out
-export type ParamSpec = Param.Spec
-export type Options = Renderer.Options
+--// The same types as Shading.Types, which can be required alone
+export type Kind = Types.Kind
+export type ParamSpec = Types.ParamSpec
+export type Out = Types.Out
+export type Evaluate = Types.Evaluate
+export type ShaderDef = Types.ShaderDef
+export type Shader = Types.Shader
+export type Material = Types.Material
+export type WriterOptions = Types.WriterOptions
+export type Frame = Types.Frame
+export type Writer = Types.Writer
+export type Options = Types.Options
+export type Binding = Types.Binding
+export type GroupOptions = Types.GroupOptions
+export type Group = Types.Group
+export type Stats = Types.Stats
 
 Shading.Config = Config
 
@@ -53,6 +66,10 @@ Shading.Sanitize = Material.Sanitize
 Shading.Equal = Material.Equal
 Shading.Decode = Material.Decode
 Shading.Hex = Param.Hex
+
+--// Materials as compact buffers for remotes and saved data
+Shading.Pack = Wire.Pack
+Shading.Unpack = Wire.Unpack
 
 --[[
 	A material's output at one moment, without drawing it anywhere: for previews and tests
@@ -91,41 +108,30 @@ end
 function Shading.Apply(material: Material, targets: { Instance }, options: Options?, time: number?)
 	local out = Shading.Evaluate(material, nil, time or 0)
 	local written = { Emissive = options ~= nil and options.Emissive == true }
+	local frame = Writers.Prepare(out, { Emission = 1 })
 
 	for _, target in targets do
 		local writer = Writers.For(target)
-		if writer then writer.Write(target, out, {}, writer.Capture(target), written, false) end
+		if writer then writer.Write(target, out, {}, writer.Capture(target), written, false, frame) end
 	end
 end
 
 --// Bindings
 
-local BindingClass = {}
-BindingClass.__index = BindingClass
-
 --[[
-	Draws a material on some instances until destroyed
+	Draws a material on some instances until destroyed. The binding has SetMaterial, SetInput, Edit
+	and Destroy.
 
 	@param material Material -- sanitized (Shading.Material or Shading.Sanitize)
 	@param targets {Instance} -- parts and lights; anything no writer draws on is skipped
 	@param options Options?
 	@return Binding
 --]]
-function Shading.Bind(material: Material, targets: { Instance }, options: Options?)
-	return setmetatable(Renderer.Bind(material, targets, options), BindingClass)
-end
+Shading.Bind = (Renderer.Bind :: any) :: (material: Material, targets: { Instance }, options: Options?) -> Binding
 
-function BindingClass:SetMaterial(material: Material)
-	Renderer.SetMaterial(self, material)
-end
-
-function BindingClass:SetInput(name: string, value: number)
-	Renderer.SetInput(self, name, value)
-end
-
-function BindingClass:Destroy()
-	Renderer.Destroy(self)
-end
+--// One binding per member of a tag or a CollectionService query, for as long as it is one
+Shading.BindTag = Group.Tag
+Shading.BindQuery = Group.Query
 
 --[[
 	Adds a writer for another class of instance (see Writers/)

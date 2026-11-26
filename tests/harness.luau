@@ -66,6 +66,8 @@ local function stubContainer(name)
 		GetChildren = function()
 			return {}
 		end,
+		DescendantAdded = { Connect = function() end },
+		DescendantRemoving = { Connect = function() end },
 	}
 end
 
@@ -97,6 +99,8 @@ local env = {
 	Enum = roblox.Enum,
 	RaycastParams = roblox.RaycastParams,
 	Color3 = roblox.Color3,
+	ColorSequence = roblox.ColorSequence,
+	NumberSequence = roblox.NumberSequence,
 	Instance = roblox.Instance,
 	typeof = roblox.typeof or typeof,
 }
@@ -166,6 +170,8 @@ function load(file)
 end
 
 return {
+	--// Services by name; a test can put its own fakes in before Load
+	Services = services,
 	Load = function()
 		return load(resolve(ROOT))
 	end,

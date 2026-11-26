@@ -5,40 +5,14 @@
 --// works out the output channels the writers put onto instances (Writers/).
 
 local Param = require(`./Param`)
+local Types = require(`./Types`)
 
 local Shader = {}
 
---// Shader write seq
-export type Out = {
-	Color: Color3?,
-	Emission: number?, -- 0..1: how lit; drives Neon on emissive parts and light brightness
-	Transparency: number?, -- 0..1
-	MaterialVariant: string?, -- a MaterialVariant under MaterialService; the part takes its base material
-}
-
-export type Evaluate = (params: { [string]: any }, inputs: { [string]: number }, time: number, out: Out) -> ()
-
-export type Def = {
-	Name: string,
-	Description: string?,
-	Params: { [string]: Param.Spec },
-	Order: { string }?, -- params in the order an editor lists them; alphabetical otherwise
-	Inputs: { [string]: number }?, -- per-binding inputs it reads, and their defaults
-	Static: boolean?, -- the output never changes with time, so it is worked out only when something it reads does
-	Rate: number?, -- evaluations per second at most; every frame when nil
-	Evaluate: Evaluate,
-}
-
-export type Shader = {
-	Name: string,
-	Description: string,
-	Params: { [string]: Param.Spec },
-	Order: { string },
-	Inputs: { [string]: number },
-	Static: boolean,
-	Rate: number?,
-	Evaluate: Evaluate,
-}
+export type Out = Types.Out
+export type Evaluate = Types.Evaluate
+export type Def = Types.ShaderDef
+export type Shader = Types.Shader
 
 local registry: { [string]: Shader } = {}
 

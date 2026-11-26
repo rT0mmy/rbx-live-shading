@@ -6,17 +6,30 @@
 local Common = require(`./Common`)
 local Shader = require(`../Shader`)
 
-type Base = { Color: Color3, Brightness: number, Enabled: boolean }
+type Base = { Color: Color3, Key: number, Brightness: number, Enabled: boolean }
 
 local Light: Common.Writer = {
 	Class = 'Light',
 
 	Capture = function(light: Light): Base
-		return { Color = light.Color, Brightness = light.Brightness, Enabled = light.Enabled }
+		return {
+			Color = light.Color,
+			Key = Common.Key(light.Color),
+			Brightness = light.Brightness,
+			Enabled = light.Enabled,
+		}
 	end,
 
-	Write = function(light: Light, out: Shader.Out, cache, base: Base, _options: Common.Options, far: boolean)
-		local emission = Common.Level(out.Emission or 1)
+	Write = function(
+		light: Light,
+		out: Shader.Out,
+		cache,
+		base: Base,
+		_options: Common.Options,
+		far: boolean,
+		frame: Common.Frame
+	)
+		local emission = frame.Emission
 		local enabled = base.Enabled and not far and emission > Common.DARK
 
 		if cache.Enabled ~= enabled then
@@ -33,15 +46,12 @@ local Light: Common.Writer = {
 			light.Brightness = brightness
 		end
 
-		local color = out.Color
+		--// Unset, the light shows its authored colour rather than the last material's
+		local key = frame.ColorKey or base.Key
 
-		if color then
-			local packed = Common.Key(color)
-
-			if cache.Color ~= packed then
-				cache.Color = packed
-				light.Color = color
-			end
+		if cache.Color ~= key then
+			cache.Color = key
+			light.Color = out.Color or base.Color
 		end
 	end,
 

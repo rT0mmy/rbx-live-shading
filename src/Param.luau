@@ -9,19 +9,12 @@
 	@Choice     { Default, Options }               one of Options
 --]]
 
+local Types = require(`./Types`)
+
 local Param = {}
 
-export type Kind = 'Number' | 'Color' | 'Colors' | 'Bool' | 'Choice'
-
-export type Spec = {
-	Kind: Kind,
-	Default: any,
-	Min: number?, -- Number: lowest value; Colors: fewest colours
-	Max: number?, -- Number: highest value; Colors: most colours
-	Step: number?, -- Number: values snap to multiples of it
-	Options: { string }?, -- Choice
-	Label: string?, -- for an editor; the param's name otherwise
-}
+export type Kind = Types.Kind
+export type Spec = Types.ParamSpec
 
 const KINDS = { Number = true, Color = true, Colors = true, Bool = true, Choice = true }
 
