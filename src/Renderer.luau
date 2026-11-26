@@ -7,7 +7,6 @@ local RunService = game:GetService('RunService')
 
 local Config = require(`./Config`)
 local Material = require(`./Material`)
-local Profiler = require(`@game/ReplicatedStorage/Modules/Shared/Profiler`)
 local Shader = require(`./Shader`)
 local Writers = require(`./Writers`)
 
@@ -155,12 +154,12 @@ function Renderer.Step(time: number, clock: number, camera: Vector3)
 end
 
 local function onRender()
-	Profiler.Begin('Shading')
+	Config.Profiler.Begin('Shading')
 
 	local camera = workspace.CurrentCamera
 	Renderer.Step(workspace:GetServerTimeNow(), os.clock(), if camera then camera.CFrame.Position else Vector3.zero)
 
-	Profiler.End()
+	Config.Profiler.End()
 end
 
 --[[

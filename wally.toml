@@ -1,0 +1,10 @@
+[package]
+name = "rt0mmy/shading"
+description = "Shaders and materials for Roblox parts and lights"
+version = "0.1.0"
+authors = ["rT0mmy"]
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+include = ["src", "src/**", "default.project.json", "wally.toml", "README.md"]
+
+[dependencies]

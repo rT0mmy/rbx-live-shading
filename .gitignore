@@ -1,0 +1,13 @@
+/Packages
+/DevPackages
+/ServerPackages
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+*.rbxlx.lock
+/sourcemap.json
+/.vscode
+/node_modules
+/globalTypes.d.luau
